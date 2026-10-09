@@ -1,0 +1,77 @@
+/* SyncDB WASN Design System - Technical Instrumentation Styles */
+
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #101416;
+    color: #e0e3e5;
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  
+  body {
+    overscroll-behavior: none;
+  }
+}
+
+/* Scrollbar elimination for clean hardware aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #101416;
+}
+::-webkit-scrollbar-thumb {
+  background: #272b2d;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3d4a3e;
+}
+
+/* Custom Font Families */
+.font-mono-tech {
+  font-family: 'JetBrains Mono', monospace;
+}
+.font-sans-clean {
+  font-family: 'Geist', sans-serif;
+}
+
+/* Hardware Glow and Phosphor Accents */
+.phosphor-glow-green {
+  text-shadow: 0 0 10px rgba(94, 223, 134, 0.45);
+}
+.phosphor-glow-amber {
+  text-shadow: 0 0 10px rgba(255, 202, 69, 0.45);
+}
+.border-hardware {
+  border: 1px solid #313537;
+}
+.border-hardware-active {
+  border: 1px solid #5edf86;
+}
+
+/* Canvas Styling */
+canvas.rta-canvas {
+  background: #0b0f11;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Tab active state */
+.tab-btn.active {
+  background-color: #30b764;
+  color: #003918;
+  font-weight: 600;
+}
+
+/* Pulsing LED Indicator */
+@keyframes led-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.9); }
+}
+.led-live {
+  animation: led-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

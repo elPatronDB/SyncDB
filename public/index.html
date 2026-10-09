@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>SYNCDB - Consola Master</title>
+
+  <!-- Typography & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#101416",
+            "surface-dim": "#0b0f11",
+            "surface-container-low": "#181c1e",
+            "surface-container": "#1c2022",
+            "surface-container-high": "#272b2d",
+            "surface-container-highest": "#313537",
+            "on-surface": "#e0e3e5",
+            "on-surface-variant": "#bccabb",
+            "primary": "#5edf86",
+            "primary-container": "#30b764",
+            "secondary": "#ffca45",
+            "tertiary": "#c0c8c2",
+            "outline": "#879486",
+            "outline-variant": "#3d4a3e"
+          },
+          fontFamily: {
+            "sans": ["Geist", "sans-serif"],
+            "mono": ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="bg-surface text-on-surface font-sans antialiased selection:bg-primary-container selection:text-[#003918]">
+
+  <!-- Top Console Header Ribbon -->
+  <header class="w-full bg-surface-container/95 border-b border-[#313537] sticky top-0 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto h-14 px-4 flex items-center justify-between gap-4">
+      
+      <!-- Brand & Status LED -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 bg-primary inline-block" id="status-indicator"></span>
+          <span class="font-mono text-sm font-bold tracking-wider text-on-surface uppercase">SYNCDB</span>
+        </div>
+        
+        <!-- Recinto Selector & New Venue Trigger -->
+        <div class="flex items-center gap-1.5 bg-surface-container-low px-2 py-1 border border-[#313537] rounded">
+          <span class="font-mono text-[10px] text-[#879486] uppercase">RECINTO:</span>
+          <select id="venue-select" class="bg-transparent font-mono text-xs text-on-surface outline-none cursor-pointer max-w-[180px]">
+            <option value="" disabled selected class="bg-[#181c1e] text-[#879486]">(Sin recintos)</option>
+          </select>
+          <button id="btn-open-create-venue" class="ml-1 px-2 py-0.5 bg-surface-container-high hover:bg-surface-container-highest text-primary border border-[#313537] rounded font-mono text-[11px] font-semibold flex items-center gap-1 transition-colors" title="Crear un nuevo recinto">
+            <span class="material-symbols-outlined text-[13px]">add</span>
+            <span>NUEVO</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex items-center bg-surface-container-low p-1 border border-[#313537] rounded">
+        <button class="tab-btn active px-3 py-1 font-mono text-xs uppercase tracking-wider text-on-surface hover:text-primary transition-colors" data-target="tab-monitoring">
+          1. Monitoreo & Curva
+        </button>
+        <button class="tab-btn px-3 py-1 font-mono text-xs uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors" data-target="tab-telemetry">
+          2. Estadísticas Venue
+        </button>
+        <button class="tab-btn px-3 py-1 font-mono text-xs uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors" data-target="tab-history">
+          3. Historial Calibraciones
+        </button>
+      </nav>
+
+      <!-- Action Group -->
+      <div class="flex items-center gap-3">
+        <!-- Live Node Count Pill -->
+        <span id="node-count-pill" class="font-mono text-xs px-2.5 py-1 rounded bg-[#ffca45]/20 text-[#ffca45] border border-[#ffca45]/50">
+          0 NODOS
+        </span>
+
+        <button id="btn-show-qr" class="flex items-center gap-1.5 px-3 py-1 bg-surface-container-high hover:bg-surface-container-highest text-on-surface border border-[#313537] rounded font-mono text-xs uppercase transition-colors" title="Ver código QR para vincular teléfonos">
+          <span class="material-symbols-outlined text-sm text-[#879486]">qr_code_2</span>
+          <span>QR</span>
+        </button>
+
+        <a id="btn-open-listener-link" href="/listener.html" target="_blank" class="hidden lg:flex items-center gap-1.5 px-3 py-1 bg-primary text-[#003918] font-mono text-xs font-semibold uppercase hover:bg-opacity-90 rounded transition-colors" title="Abrir modo oyente en nueva pestaña">
+          <span class="material-symbols-outlined text-sm">hearing</span>
+          <span>Modo Oyente</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Empty Venue Warning Banner (Hidden once a venue exists) -->
+  <div id="no-venue-banner" class="max-w-7xl mx-auto mt-4 px-4 hidden">
+    <div class="p-4 bg-surface-container border border-[#ffca45]/50 rounded flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-[#ffca45] text-2xl">warning</span>
+        <div>
+          <div class="font-mono text-xs font-bold text-on-surface uppercase">No hay ningún recinto creado o seleccionado</div>
+          <div class="font-mono text-[11px] text-[#879486]">Cree un nuevo recinto para comenzar a medir y calibrar con los micrófonos móviles.</div>
+        </div>
+      </div>
+      <button id="btn-banner-create-venue" class="px-3 py-1.5 bg-primary text-[#003918] font-mono text-xs font-bold uppercase rounded flex items-center gap-1.5 hover:bg-[#38cf72]">
+        <span class="material-symbols-outlined text-sm">add</span>
+        <span>Crear Recinto</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto p-4 md:p-6 flex flex-col gap-6">
+
+    <!-- TAB 1: MONITOREO & CURVA EN VIVO -->
+    <div id="tab-monitoring" class="tab-content flex flex-col gap-6">
+      
+      <!-- Telemetry Cards (Clean, Minimal, Real-Time Data) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <!-- Card 1: Nivel Promedio dBA (Ponderación A) -->
+        <div class="bg-surface-container p-4 border border-[#313537] rounded flex flex-col justify-between">
+          <div class="flex items-center justify-between text-[11px] font-mono text-[#879486] uppercase">
+            <span>Nivel Promedio (dBA Ponderación A)</span>
+            <span id="spl-dispersion" class="text-on-surface font-semibold">± 0.0 dB</span>
+          </div>
+          <div class="my-2 flex items-baseline gap-2">
+            <span class="font-mono text-4xl font-bold text-on-surface" id="avg-spl">--.-</span>
+            <span class="font-mono text-sm text-primary uppercase font-bold">dBA Leq</span>
+          </div>
+          <div class="text-[10px] font-mono text-[#879486] flex items-center justify-between">
+            <span>Señal espacial en tiempo real</span>
+            <span id="spl-peak-label" class="text-on-surface-variant">Pico: --.- dBA</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Estado de la Calibración en Tiempo Real -->
+        <div class="bg-surface-container p-4 border border-[#313537] rounded flex flex-col justify-between">
+          <div class="flex items-center justify-between text-[11px] font-mono text-[#879486] uppercase">
+            <span>Estado de Calibración</span>
+            <span class="text-outline font-mono text-[10px]">OBJETIVO: 0 dB</span>
+          </div>
+          <div class="my-2 flex items-baseline gap-2">
+            <span class="font-mono text-2xl font-bold text-[#879486]" id="calib-status-text">SIN SEÑAL</span>
+          </div>
+          <div class="text-[10px] font-mono text-[#879486]" id="calib-dev-text">
+            Conecte micrófonos para evaluar la respuesta de sala
+          </div>
+        </div>
+
+        <!-- Card 3: Botón de Calibrar (Minimalista con Icono) -->
+        <div class="bg-surface-container p-4 border border-[#313537] rounded flex flex-col justify-between">
+          <div class="flex items-center justify-between text-[11px] font-mono text-[#879486] uppercase">
+            <span>Acción de Calibración</span>
+            <span class="text-primary text-[10px] font-mono">1-CLICK PEQ</span>
+          </div>
+          <div class="my-1">
+            <button id="btn-calibrate" class="w-full py-2.5 px-4 bg-primary hover:bg-[#38cf72] active:scale-[0.98] text-[#003918] font-mono text-sm font-bold uppercase tracking-wider rounded transition-all flex items-center justify-center gap-2 shadow-sm">
+              <span class="material-symbols-outlined text-lg">tune</span>
+              <span>CALIBRAR</span>
+            </button>
+          </div>
+          <div class="text-[10px] font-mono text-[#879486] text-center" id="calib-action-sub">
+            Calcula ecualización paramétrica para buscar curva plana
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Success Alert Banner (when calibrated) -->
+      <div id="calibration-alert" class="hidden p-3 bg-[#30b764]/20 border border-[#30b764] rounded font-mono text-xs text-[#5edf86] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">check_circle</span>
+          <span>CALIBRACIÓN COMPLETADA: Curva plana sintetizada y snapshot guardado en el recinto.</span>
+        </div>
+        <span class="text-[10px] text-on-surface uppercase">SNAPSHOT OK</span>
+      </div>
+
+      <!-- Main Analyzer Deck: Left (RTA Canvas) + Right (Dispositivos Conectados) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left 8 Cols: Real-Time Acoustic RTA Spectrum Canvas -->
+        <div class="lg:col-span-8 bg-surface-container p-4 border border-[#313537] rounded flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-[#313537]/60 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-bold text-on-surface uppercase">ESPECTRÓGRAFO EN TIEMPO REAL</span>
+              <span class="font-mono text-[10px] text-[#879486] px-1.5 py-0.5 bg-surface-container-high rounded">IEC 1/1 OCT</span>
+            </div>
+            <div class="flex items-center gap-4 text-[11px] font-mono">
+              <span class="flex items-center gap-1.5 text-primary">
+                <span class="w-2.5 h-0.5 bg-primary inline-block"></span> Señal Promedio Real
+              </span>
+              <span class="flex items-center gap-1.5 text-white">
+                <span class="w-2.5 h-0.5 bg-white inline-block border-t border-dashed"></span> Curva Plana (0 dB)
+              </span>
+              <span class="flex items-center gap-1.5 text-secondary">
+                <span class="w-2.5 h-0.5 bg-secondary inline-block border-t border-dashed"></span> Corrección PEQ
+              </span>
+            </div>
+          </div>
+
+          <!-- HTML5 Canvas for Live FFT Audio -->
+          <div class="w-full h-80 bg-[#0b0f11] rounded border border-[#313537]/80 relative overflow-hidden">
+            <canvas id="rta-canvas" class="rta-canvas"></canvas>
+          </div>
+
+          <!-- Bottom Legend Info -->
+          <div class="flex items-center justify-between text-[11px] font-mono text-[#879486] pt-1">
+            <span>Resolución: Dual-FFT 2048 pts // Ventana Hanning</span>
+            <span>Rango: 20 Hz - 20 000 Hz</span>
+          </div>
+        </div>
+
+        <!-- Right 4 Cols: Lista de Dispositivos Conectados (Micrófonos) -->
+        <div class="lg:col-span-4 bg-surface-container p-4 border border-[#313537] rounded flex flex-col justify-between">
+          <div class="w-full">
+            <div class="flex items-center justify-between border-b border-[#313537]/60 pb-2 mb-3">
+              <span class="font-mono text-xs font-bold text-on-surface uppercase">DISPOSITIVOS CONECTADOS (MICRÓFONOS)</span>
+              <span class="font-mono text-[10px] text-primary" id="nodes-count-header">0 ACTIVOS</span>
+            </div>
+            
+            <div class="flex flex-col gap-1 max-h-80 overflow-y-auto pr-1" id="active-nodes-list">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Generated Parametric Auto-EQ Filters Matrix -->
+      <div class="bg-surface-container p-4 border border-[#313537] rounded flex flex-col gap-3">
+        <div class="flex items-center justify-between border-b border-[#313537]/60 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="font-mono text-xs font-bold text-on-surface uppercase">Matriz de Filtros Paramétricos (PEQ)</span>
+            <span class="font-mono text-[10px] text-primary px-1.5 py-0.5 bg-surface-container-high rounded">CURVA PLANA</span>
+          </div>
+          
+          <button id="btn-save-snapshot" class="px-3 py-1 bg-surface-container-high hover:bg-surface-container-highest text-on-surface border border-[#313537] rounded font-mono text-xs uppercase flex items-center gap-1.5 transition-colors">
+            <span class="material-symbols-outlined text-sm text-secondary">camera</span>
+            <span>Guardar Snapshot</span>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-[#313537] text-[11px] font-mono text-[#879486] uppercase">
+                <th class="py-2 px-4">Banda</th>
+                <th class="py-2 px-4">Frecuencia</th>
+                <th class="py-2 px-4">Ganancia Correctiva</th>
+                <th class="py-2 px-4">Factor Q</th>
+                <th class="py-2 px-4">Tipo</th>
+              </tr>
+            </thead>
+            <tbody id="peq-table-body">
+              <tr>
+                <td colspan="5" class="py-4 text-center text-[#879486] font-mono text-xs">
+                  Presione <strong>"CALIBRAR"</strong> para calcular los filtros de corrección de la sala.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: ESTADÍSTICAS DEL VENUE & TELEMETRÍA AMBIENTAL -->
+    <div id="tab-telemetry" class="tab-content hidden flex flex-col gap-6">
+      
+      <!-- Environmental Cards (Real-time GPS / Open-Meteo) -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        
+        <div class="bg-surface-container p-4 border border-[#313537] rounded flex flex-col">
+          <span class="font-mono text-[11px] text-[#879486] uppercase">Temperatura Ambiental</span>
+          <span class="font-mono text-2xl font-bold text-on-surface mt-2" id="stats-temp">--.- °C</span>
+          <span class="font-mono text-[10px] text-primary mt-1">GPS Móvil + Open-Meteo</span>
+        </div>
+
+        <div class="bg-surface-container p-4 border border-[#313537] rounded flex flex-col">
+          <span class="font-mono text-[11px] text-[#879486] uppercase">Humedad Relativa</span>
+          <span class="font-mono text-2xl font-bold text-on-surface mt-2" id="stats-humidity">-- %</span>
+          <span class="font-mono text-[10px] text-[#879486] mt-1">Absorción alta frecuencia</span>
+        </div>
+
+        <div class="bg-surface-container p-4 border border-[#313537] rounded flex flex-col">
+          <span class="font-mono text-[11px] text-[#879486] uppercase">Velocidad del Sonido (c)</span>
+          <span class="font-mono text-2xl font-bold text-primary mt-2" id="stats-soundspeed">--.- m/s</span>
+          <span class="font-mono text-[10px] text-[#879486] mt-1">c = 331.4 + 0.606·T + 0.0124·HR</span>
+        </div>
+
+        <div class="bg-surface-container p-4 border border-[#313537] rounded flex flex-col">
+          <span class="font-mono text-[11px] text-[#879486] uppercase">Retardo / Metro</span>
+          <span class="font-mono text-2xl font-bold text-secondary mt-2" id="stats-delay">--.--- ms/m</span>
+          <span class="font-mono text-[10px] text-[#879486] mt-1">Alineación torres de delay</span>
+        </div>
+
+      </div>
+
+      <!-- Detail of Active Transducers Table -->
+      <div class="bg-surface-container p-4 border border-[#313537] rounded flex flex-col gap-3">
+        <div class="flex items-center justify-between border-b border-[#313537]/60 pb-2">
+          <span class="font-mono text-xs font-bold text-on-surface uppercase">Detalle de Dispositivos Conectados (<span id="stats-node-count">0</span>)</span>
+          <span class="font-mono text-[11px] text-[#879486]">Malla Acústica en Tiempo Real</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-[#313537] text-[11px] font-mono text-[#879486] uppercase">
+                <th class="py-2 px-3">ID Dispositivo</th>
+                <th class="py-2 px-3">Modelo / Sistema</th>
+                <th class="py-2 px-3">Calibración Mic</th>
+                <th class="py-2 px-3">SPL dBA Leq</th>
+                <th class="py-2 px-3">Estado</th>
+              </tr>
+            </thead>
+            <tbody id="telemetry-nodes-table">
+              <tr>
+                <td colspan="5" class="py-4 text-center text-[#879486] font-mono text-xs">
+                  No hay dispositivos conectados en este momento.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 3: HISTORIAL DE CALIBRACIONES (SNAPSHOTS) -->
+    <div id="tab-history" class="tab-content hidden flex flex-col gap-6">
+      
+      <div class="bg-surface-container p-4 border border-[#313537] rounded flex flex-col gap-3">
+        <div class="flex items-center justify-between border-b border-[#313537]/60 pb-2">
+          <div>
+            <span class="font-mono text-xs font-bold text-on-surface uppercase">Snapshots de Calibración del Recinto (Día & Hora)</span>
+            <p class="text-[11px] text-[#879486] mt-0.5">Historial persistente con temperatura, velocidad del sonido, nodos y filtros sintetizados.</p>
+          </div>
+          <span class="font-mono text-[10px] text-primary px-2 py-0.5 bg-surface-container-high rounded border border-[#313537]">HISTORIAL LOCAL</span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-[#313537] text-[11px] font-mono text-[#879486] uppercase">
+                <th class="py-2 px-3">Fecha (Día)</th>
+                <th class="py-2 px-3">Hora</th>
+                <th class="py-2 px-3">Micrófonos</th>
+                <th class="py-2 px-3">Ambiente (T / HR / c)</th>
+                <th class="py-2 px-3">SPL dBA</th>
+                <th class="py-2 px-3">Filtros Correctivos</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Create New Venue Modal -->
+  <div id="create-venue-modal" class="fixed inset-0 bg-surface/95 backdrop-blur-md flex items-center justify-center p-6 opacity-0 pointer-events-none transition-opacity duration-200 z-50">
+    <div class="bg-surface-container border border-[#313537] rounded-xl p-6 max-w-sm w-full flex flex-col gap-4 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b border-[#313537] pb-2">
+        <span class="font-mono text-xs font-bold text-primary uppercase">Crear Nuevo Recinto</span>
+        <button id="btn-close-create-venue" class="text-[#879486] hover:text-on-surface">
+          <span class="material-symbols-outlined text-base">close</span>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <div>
+          <label class="block font-mono text-[11px] text-[#879486] uppercase mb-1">Nombre del Recinto:</label>
+          <input id="new-venue-name" type="text" placeholder="Ej: Teatro Principal / Arena Norte" class="w-full bg-surface-dim border border-[#313537] rounded px-3 py-2 font-mono text-xs text-on-surface outline-none focus:border-primary"/>
+        </div>
+
+        <div>
+          <label class="block font-mono text-[11px] text-[#879486] uppercase mb-1">Capacidad estimada (Asistentes):</label>
+          <input id="new-venue-capacity" type="number" placeholder="500" class="w-full bg-surface-dim border border-[#313537] rounded px-3 py-2 font-mono text-xs text-on-surface outline-none focus:border-primary"/>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#313537]/50">
+        <button id="btn-cancel-create-venue" class="px-3 py-1.5 text-[#879486] hover:text-on-surface font-mono text-xs uppercase">
+          Cancelar
+        </button>
+        <button id="btn-submit-create-venue" class="px-4 py-1.5 bg-primary text-[#003918] font-mono text-xs font-bold uppercase rounded hover:bg-[#38cf72]">
+          Crear Recinto
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Venue QR Code Pairing Modal -->
+  <div id="console-qr-modal" class="fixed inset-0 bg-surface/95 backdrop-blur-md flex flex-col items-center justify-center p-6 opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+    <div class="bg-surface-container border border-[#313537] rounded-xl p-6 max-w-sm w-full flex flex-col items-center gap-4 text-center relative shadow-2xl">
+      <button id="console-qr-close" class="absolute top-3 right-3 text-[#879486] hover:text-on-surface p-1">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+
+      <span class="font-mono text-xs font-bold text-primary uppercase tracking-wider">Vincular Micrófono al Recinto</span>
+      
+      <div class="w-56 h-56 bg-[#0b0f11] p-3 rounded-lg border border-[#313537] flex items-center justify-center">
+        <img id="console-qr-img" class="w-full h-full object-contain" alt="QR Code"/>
+      </div>
+
+      <div class="flex flex-col gap-1 w-full">
+        <span class="font-mono text-[11px] text-on-surface">Escanee con la cámara de su teléfono</span>
+        <a id="console-qr-url" href="#" target="_blank" class="font-mono text-[10px] text-[#879486] hover:text-primary break-all underline">
+          https://...
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Acoustic Math Engine -->
+  <script src="/js/acoustic-math.js"></script>
+  <!-- Master Console Controller -->
+  <script src="/js/console.js"></script>
+</body>
+</html>

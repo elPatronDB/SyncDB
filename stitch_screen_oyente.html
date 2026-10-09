@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_blank" name="shell-type"/><title>SyncDB // WASN ENGINE - Calibración</title><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-background":"#e0e3e5","on-secondary-container":"#5b4400","on-secondary-fixed":"#251a00","outline":"#879486","primary-container":"#30b764","inverse-on-surface":"#2d3133","error-container":"#93000a","surface-tint":"#5edf86","background":"#101416","on-tertiary":"#2b322e","on-primary-fixed-variant":"#005226","tertiary-container":"#9ba39d","on-secondary-fixed-variant":"#5a4300","primary-fixed-dim":"#5edf86","error":"#ffb4ab","surface-container-low":"#181c1e","tertiary-fixed-dim":"#c0c8c2","secondary-fixed":"#ffdf9a","tertiary":"#c0c8c2","surface-bright":"#363a3c","on-tertiary-container":"#323935","secondary-container":"#e4ae00","on-primary":"#003918","secondary":"#ffca45","on-error":"#690005","on-surface-variant":"#bccabb","inverse-surface":"#e0e3e5","surface-container-high":"#272b2d","on-tertiary-fixed":"#161d19","surface-dim":"#101416","on-error-container":"#ffdad6","surface-variant":"#313537","surface":"#101416","surface-container-lowest":"#0b0f11","on-secondary":"#3f2e00","surface-container-highest":"#313537","primary":"#5edf86","outline-variant":"#3d4a3e","on-primary-container":"#00411d","secondary-fixed-dim":"#f7be1d","surface-container":"#1c2022","on-surface":"#e0e3e5","inverse-primary":"#006d35","on-tertiary-fixed-variant":"#414944","primary-fixed":"#7cfca0","tertiary-fixed":"#dde4de","on-primary-fixed":"#00210c"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"gutter-lg":"1.5rem","space-sm":"0.5rem","margin-lg":"2rem","gutter":"0.75rem","margin-md":"1.5rem","space-lg":"1.25rem","space-md":"0.75rem","space-xl":"2rem","margin":"1rem","space-xs":"0.25rem","gutter-md":"1rem"},"fontFamily":{"label-sm":["JetBrains Mono"],"body-sm":["Geist"],"body-lg":["Geist"],"body-md":["Geist"],"label-md":["JetBrains Mono"],"headline-xl-mobile":["Geist"],"headline-xl":["Geist"],"telemetry-unit":["JetBrains Mono"],"label-lg":["JetBrains Mono"],"headline-lg":["Geist"],"headline-md":["Geist"],"telemetry-display":["JetBrains Mono"]},"fontSize":{"label-sm":["9px",{"lineHeight":"12px","letterSpacing":"0.1em","fontWeight":"400"}],"body-sm":["11px",{"lineHeight":"16px","fontWeight":"400"}],"body-lg":["14px",{"lineHeight":"20px","fontWeight":"400"}],"body-md":["13px",{"lineHeight":"18px","fontWeight":"400"}],"label-md":["10px",{"lineHeight":"14px","letterSpacing":"0.08em","fontWeight":"500"}],"headline-xl-mobile":["22px",{"lineHeight":"28px","letterSpacing":"0.02em","fontWeight":"600"}],"headline-xl":["28px",{"lineHeight":"36px","letterSpacing":"0.02em","fontWeight":"600"}],"telemetry-unit":["11px",{"lineHeight":"14px","letterSpacing":"0.05em","fontWeight":"400"}],"label-lg":["12px",{"lineHeight":"16px","letterSpacing":"0.06em","fontWeight":"500"}],"headline-lg":["20px",{"lineHeight":"28px","letterSpacing":"0.04em","fontWeight":"500"}],"headline-md":["16px",{"lineHeight":"24px","letterSpacing":"0.04em","fontWeight":"500"}],"telemetry-display":["24px",{"lineHeight":"30px","letterSpacing":"-0.02em","fontWeight":"600"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><main class="min-h-screen w-full flex items-center justify-center p-margin-lg bg-surface"><div class="flex flex-col w-full items-center justify-center min-h-[calc(100vh-4rem)]">
+<div class="w-full max-w-sm flex flex-col justify-between py-margin-lg px-margin min-h-[640px] bg-surface-container-lowest rounded-xl shadow-xl relative overflow-hidden select-none">
+<!-- Top Hardware Utility Ribbon -->
+<header class="w-full flex items-center justify-between z-10">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary inline-block transition-opacity duration-1000" id="network-led"></span>
+<span class="font-label-lg text-label-lg tracking-wider text-on-surface uppercase">SyncDB</span>
+</div>
+<button class="flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors" id="qr-trigger">
+<span class="material-symbols-outlined text-[13px] leading-none text-outline">qr_code_2</span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant">Compartir QR</span>
+</button>
+</header>
+<!-- Radar / Transducer Visualizer Center -->
+<div class="flex-1 flex flex-col items-center justify-center relative my-margin-lg">
+<div class="relative w-72 h-72 flex items-center justify-center">
+<!-- Concentric Acoustic Field Rings -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" fill="none" viewbox="0 0 288 288">
+<circle cx="144" cy="144" opacity="0.6" r="136" stroke="#313537" stroke-dasharray="2 3" stroke-width="1"></circle>
+<circle class="transition-all duration-700 ease-out" cx="144" cy="144" id="pulse-ring-3" opacity="0.15" r="102" stroke="#30b764" stroke-width="1"></circle>
+<circle class="transition-all duration-500 ease-out" cx="144" cy="144" id="pulse-ring-2" opacity="0.3" r="70" stroke="#30b764" stroke-width="1"></circle>
+<circle class="transition-all duration-300 ease-out" cx="144" cy="144" id="pulse-ring-1" opacity="0.6" r="38" stroke="#30b764" stroke-width="1.2"></circle>
+<!-- Subtle Crosshair Coordinates (Engineering Calibration Reticle) -->
+<line opacity="0.4" stroke="#879486" stroke-width="1" x1="144" x2="144" y1="20" y2="40"></line>
+<line opacity="0.4" stroke="#879486" stroke-width="1" x1="144" x2="144" y1="248" y2="268"></line>
+<line opacity="0.4" stroke="#879486" stroke-width="1" x1="20" x2="40" y1="144" y2="144"></line>
+<line opacity="0.4" stroke="#879486" stroke-width="1" x1="248" x2="268" y1="144" y2="144"></line>
+</svg>
+<!-- Center Transducer Node Core -->
+<div class="relative flex items-center justify-center">
+<div class="absolute w-12 h-12 rounded-full bg-primary/20 blur-md transition-all duration-700" id="halo-glow"></div>
+<div class="w-3.5 h-3.5 rounded-full bg-primary z-10 transition-transform duration-500 shadow-sm shadow-primary/40" id="transducer-core"></div>
+</div>
+</div>
+<!-- State Subtext Description -->
+<div class="flex items-center gap-space-xs mt-space-md z-10">
+<span class="w-1.5 h-1.5 rounded-full bg-outline-variant" id="carrier-state-bullet"></span>
+<span class="font-label-sm text-label-sm tracking-widest uppercase text-tertiary" id="carrier-state-label">Espectro En Espera</span>
+</div>
+</div>
+<!-- Interaction Block -->
+<div class="flex flex-col items-center gap-space-md z-10 w-full">
+<!-- Main Connect Toggle Pill -->
+<button class="w-full h-12 rounded-full flex items-center justify-center gap-space-sm bg-on-background text-surface font-label-lg text-label-lg uppercase tracking-wider transition-all duration-300 active:scale-[0.98] shadow-md hover:bg-tertiary-fixed" id="toggle-connect">
+<span class="w-2 h-2 rounded-full bg-surface-container-highest hidden" id="toggle-indicator"></span>
+<span id="toggle-label">Toca para Conectar</span>
+</button>
+<!-- Trust & Compliance Spec -->
+<p class="font-label-sm text-label-sm tracking-wider uppercase text-outline text-center flex items-center justify-center gap-space-xs">
+<span class="material-symbols-outlined text-[11px] leading-none text-outline">verified_user</span>
+<span>Privacidad en el dispositivo • Sin grabación de voz</span>
+</p>
+<!-- Technician Master Gateway -->
+<div class="pt-space-md w-full flex justify-center">
+<a class="font-label-sm text-label-sm tracking-widest text-outline-variant hover:text-outline transition-colors uppercase py-1" href="#master-console">
+          [ Consola Master ]
+        </a>
+</div>
+</div>
+<!-- Modal Mock for QR Transfer -->
+<div class="absolute inset-0 bg-surface/95 backdrop-blur-md flex flex-col items-center justify-between p-margin-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50" id="qr-modal">
+<div class="w-full flex justify-end">
+<button class="p-1 text-on-surface-variant hover:text-on-surface" id="qr-close">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="flex flex-col items-center gap-space-lg w-full">
+<div class="w-48 h-48 bg-surface-container flex items-center justify-center rounded-lg p-space-md shadow-inner">
+<!-- Stylized Algorithmic QR Graticule -->
+<svg class="w-full h-full text-primary" fill="currentColor" viewbox="0 0 100 100">
+<rect fill="none" height="28" rx="2" stroke="currentColor" stroke-width="4" width="28" x="10" y="10"></rect>
+<rect height="12" width="12" x="18" y="18"></rect>
+<rect fill="none" height="28" rx="2" stroke="currentColor" stroke-width="4" width="28" x="62" y="10"></rect>
+<rect height="12" width="12" x="70" y="18"></rect>
+<rect fill="none" height="28" rx="2" stroke="currentColor" stroke-width="4" width="28" x="10" y="62"></rect>
+<rect height="12" width="12" x="18" y="70"></rect>
+<rect height="12" width="8" x="46" y="14"></rect>
+<rect height="18" width="8" x="46" y="34"></rect>
+<rect height="8" width="12" x="62" y="46"></rect>
+<rect height="20" width="10" x="80" y="46"></rect>
+<rect height="8" width="18" x="46" y="62"></rect>
+<rect height="16" width="18" x="70" y="74"></rect>
+<rect height="12" width="8" x="46" y="78"></rect>
+</svg>
+</div>
+<div class="text-center">
+<div class="font-label-md text-label-md tracking-widest text-on-surface uppercase">Emparejamiento WASN</div>
+<div class="font-label-sm text-label-sm text-outline uppercase mt-space-xs">Escanee para sincronizar nodo oyente</div>
+</div>
+</div>
+<div class="font-label-sm text-label-sm text-outline-variant uppercase tracking-widest">
+        SYNC-NODE-UID #049-XA
+      </div>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    let connected = false;
+    let pulseInterval = null;
+
+    const toggleBtn = document.getElementById('toggle-connect');
+    const toggleLabel = document.getElementById('toggle-label');
+    const toggleIndicator = document.getElementById('toggle-indicator');
+    const stateLabel = document.getElementById('carrier-state-label');
+    const stateBullet = document.getElementById('carrier-state-bullet');
+    const ring1 = document.getElementById('pulse-ring-1');
+    const ring2 = document.getElementById('pulse-ring-2');
+    const ring3 = document.getElementById('pulse-ring-3');
+    const halo = document.getElementById('halo-glow');
+    const core = document.getElementById('transducer-core');
+    const networkLed = document.getElementById('network-led');
+
+    // Ambient Acoustic Breathing Loop (Simulated acoustic wavefront)
+    let phase = 0;
+    function simulateAcousticField() {
+      phase += 0.04;
+      const energy = connected 
+        ? 0.75 + 0.25 * Math.sin(phase * 2.2) 
+        : 0.35 + 0.15 * Math.sin(phase);
+
+      const scale1 = 38 + energy * 8;
+      const scale2 = 70 + energy * 16;
+      const scale3 = 102 + energy * 26;
+
+      ring1.setAttribute('r', scale1);
+      ring2.setAttribute('r', scale2);
+      ring3.setAttribute('r', scale3);
+
+      if (connected) {
+        ring1.setAttribute('opacity', 0.5 + energy * 0.4);
+        ring2.setAttribute('opacity', 0.25 + energy * 0.3);
+        ring3.setAttribute('opacity', 0.1 + energy * 0.2);
+        halo.style.transform = `scale(${1 + energy * 0.5})`;
+      } else {
+        ring1.setAttribute('opacity', 0.25);
+        ring2.setAttribute('opacity', 0.15);
+        ring3.setAttribute('opacity', 0.08);
+        halo.style.transform = `scale(1)`;
+      }
+
+      requestAnimationFrame(simulateAcousticField);
+    }
+    requestAnimationFrame(simulateAcousticField);
+
+    // Toggle Connection Handling
+    toggleBtn.addEventListener('click', () => {
+      connected = !connected;
+      if (connected) {
+        // Active Oyente Conectado state
+        toggleBtn.classList.remove('bg-on-background', 'text-surface', 'hover:bg-tertiary-fixed');
+        toggleBtn.classList.add('bg-surface-container-high', 'text-primary');
+        toggleIndicator.classList.remove('hidden', 'bg-surface-container-highest');
+        toggleIndicator.classList.add('bg-primary', 'shadow-sm', 'shadow-primary/50');
+        toggleLabel.textContent = 'Oyente Conectado';
+
+        stateLabel.textContent = 'Acústica Sincronizada';
+        stateLabel.classList.remove('text-tertiary');
+        stateLabel.classList.add('text-primary');
+
+        stateBullet.classList.remove('bg-outline-variant');
+        stateBullet.classList.add('bg-primary');
+
+        networkLed.classList.add('animate-pulse');
+        core.classList.add('scale-125');
+      } else {
+        // Disconnected state
+        toggleBtn.classList.add('bg-on-background', 'text-surface', 'hover:bg-tertiary-fixed');
+        toggleBtn.classList.remove('bg-surface-container-high', 'text-primary');
+        toggleIndicator.classList.add('hidden');
+        toggleLabel.textContent = 'Toca para Conectar';
+
+        stateLabel.textContent = 'Espectro En Espera';
+        stateLabel.classList.add('text-tertiary');
+        stateLabel.classList.remove('text-primary');
+
+        stateBullet.classList.add('bg-outline-variant');
+        stateBullet.classList.remove('bg-primary');
+
+        networkLed.classList.remove('animate-pulse');
+        core.classList.remove('scale-125');
+      }
+    });
+
+    // QR Sheet modal triggers
+    const qrTrigger = document.getElementById('qr-trigger');
+    const qrClose = document.getElementById('qr-close');
+    const qrModal = document.getElementById('qr-modal');
+
+    qrTrigger.addEventListener('click', () => {
+      qrModal.classList.remove('opacity-0', 'pointer-events-none');
+    });
+
+    qrClose.addEventListener('click', () => {
+      qrModal.classList.add('opacity-0', 'pointer-events-none');
+    });
+  })();
+</script></main></body></html>

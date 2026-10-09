@@ -1,0 +1,15 @@
+{
+  "venues": [
+    {
+      "id": "VEN-MV1I6K5H",
+      "name": "Auditorio Principal",
+      "capacity": 500,
+      "surface": "Estándar",
+      "createdAt": "2026-10-09T21:54:27.845Z",
+      "temperature": 20,
+      "humidity": 50,
+      "speedOfSound": 343.5,
+      "calibrations": []
+    }
+  ]
+}

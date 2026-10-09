@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html class="dark" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>SYNCDB - Modo Oyente</title>
+  
+  <!-- Fonts: Geist & JetBrains Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#101416",
+            "surface-dim": "#0b0f11",
+            "surface-container": "#1c2022",
+            "surface-container-high": "#272b2d",
+            "surface-container-highest": "#313537",
+            "on-surface": "#e0e3e5",
+            "on-surface-variant": "#bccabb",
+            "primary": "#5edf86",
+            "primary-container": "#30b764",
+            "secondary": "#ffca45",
+            "outline": "#879486",
+            "outline-variant": "#3d4a3e"
+          },
+          fontFamily: {
+            "sans": ["Geist", "sans-serif"],
+            "mono": ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body class="bg-surface text-on-surface font-sans antialiased select-none overflow-x-hidden">
+
+  <!-- Mobile Viewport Container -->
+  <main class="min-h-screen w-full flex flex-col justify-between p-4 max-w-md mx-auto">
+    
+    <!-- Top Utility Header -->
+    <header class="w-full flex items-center justify-between py-2 border-b border-[#313537]/60">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#ffca45] inline-block transition-colors" id="network-led"></span>
+        <span class="font-mono text-sm font-bold tracking-wider text-on-surface uppercase">SYNCDB</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-[10px] text-primary px-2 py-0.5 bg-surface-container rounded" id="node-id-display">NODE-01</span>
+        <button class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors" id="qr-trigger" title="Compartir QR">
+          <span class="material-symbols-outlined text-sm text-outline">qr_code_2</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Venue Identifier Ribbon -->
+    <div class="w-full flex items-center justify-between text-xs font-mono py-1.5 border-b border-[#313537]/30">
+      <span class="text-[#879486]">RECINTO: <strong class="text-on-surface" id="venue-name-display">Cargando...</strong></span>
+      <span class="text-primary font-medium text-[11px]" id="carrier-state-label">EN ESPERA</span>
+    </div>
+
+    <!-- Acoustic Reticle & Live Transducer Visualizer -->
+    <div class="flex-1 flex flex-col items-center justify-center my-2 relative">
+      <div class="relative w-64 h-64 flex items-center justify-center">
+        <!-- Concentric Acoustic Field Rings -->
+        <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 288 288">
+          <circle cx="144" cy="144" r="136" stroke="#313537" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>
+          <circle class="transition-all duration-300 ease-out" cx="144" cy="144" r="102" stroke="#30b764" stroke-width="1" opacity="0.2" id="pulse-ring-3"/>
+          <circle class="transition-all duration-200 ease-out" cx="144" cy="144" r="70" stroke="#30b764" stroke-width="1" opacity="0.35" id="pulse-ring-2"/>
+          <circle class="transition-all duration-100 ease-out" cx="144" cy="144" r="38" stroke="#30b764" stroke-width="1.5" opacity="0.7" id="pulse-ring-1"/>
+          
+          <!-- Crosshair Precision Reticles -->
+          <line x1="144" y1="20" x2="144" y2="45" stroke="#879486" stroke-width="1" opacity="0.5"/>
+          <line x1="144" y1="243" x2="144" y2="268" stroke="#879486" stroke-width="1" opacity="0.5"/>
+          <line x1="20" y1="144" x2="45" y2="144" stroke="#879486" stroke-width="1" opacity="0.5"/>
+          <line x1="243" y1="144" x2="268" y2="144" stroke="#879486" stroke-width="1" opacity="0.5"/>
+        </svg>
+
+        <!-- Center Transducer Node Core -->
+        <div class="relative flex flex-col items-center justify-center text-center z-10 pointer-events-none">
+          <div class="absolute w-20 h-20 rounded-full bg-primary/20 blur-xl opacity-40 transition-all duration-300" id="halo-glow"></div>
+          <div class="w-4 h-4 rounded-full bg-primary mb-2 shadow-lg shadow-primary/50 transition-transform duration-100" id="transducer-core"></div>
+          <div class="font-mono text-3xl font-bold tracking-tight text-on-surface" id="spl-value">--.-</div>
+          <div class="font-mono text-[10px] text-primary tracking-widest uppercase">dBA Leq</div>
+        </div>
+      </div>
+
+      <!-- Real-Time Mini-RTA Octave Bars -->
+      <div class="w-full max-w-xs mt-1 bg-surface-dim p-2 rounded-lg border border-[#313537]/80">
+        <div class="flex items-center justify-between text-[10px] font-mono text-[#879486] mb-1">
+          <span>ESPECTRO EN VIVO</span>
+          <span class="text-primary">20 Hz - 20 kHz</span>
+        </div>
+        <div class="flex items-end justify-between gap-1 w-full" id="mini-rta-container">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Phone Microphone Calibration Switch -->
+    <div class="w-full bg-surface-container p-2.5 rounded-lg border border-[#313537] mb-2.5">
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="font-mono text-[11px] font-semibold text-on-surface uppercase">Curva de Micrófono</span>
+        <span id="calib-status-badge" class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-[#30b764]/20 text-[#5edf86] border border-[#30b764]/40">
+          CURVA PLANA
+        </span>
+      </div>
+      <button class="w-full py-1.5 px-3 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded font-mono text-[11px] uppercase tracking-wider transition-colors border border-[#313537] flex items-center justify-center gap-1.5" id="mic-calib-toggle">
+        <span class="material-symbols-outlined text-sm text-secondary">tune</span>
+        <span>Alternar: Raw / Curva Plana</span>
+      </button>
+    </div>
+
+    <!-- Real-Time Environmental Telemetry Grid (GPS + Open-Meteo) -->
+    <div class="grid grid-cols-2 gap-2 mb-3">
+      <div class="bg-surface-dim p-2.5 rounded border border-[#313537]/70 flex flex-col">
+        <span class="font-mono text-[10px] text-[#879486] uppercase">Temperatura / Humedad</span>
+        <div class="flex items-baseline gap-1.5 mt-0.5">
+          <span class="font-mono text-base font-semibold text-on-surface" id="temp-value">--.-°C</span>
+          <span class="font-mono text-xs text-[#879486]" id="humidity-value">--%</span>
+        </div>
+      </div>
+      <div class="bg-surface-dim p-2.5 rounded border border-[#313537]/70 flex flex-col">
+        <span class="font-mono text-[10px] text-[#879486] uppercase">Vel. Sonido / Retardo</span>
+        <div class="flex items-baseline gap-1.5 mt-0.5">
+          <span class="font-mono text-base font-semibold text-primary" id="soundspeed-value">--.- m/s</span>
+          <span class="font-mono text-[10px] text-secondary" id="delay-value">-- ms/m</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Connect Button -->
+    <div class="w-full flex flex-col items-center gap-1.5">
+      <button class="w-full h-12 rounded-full flex items-center justify-center gap-2 bg-on-background text-surface font-mono text-xs uppercase tracking-wider font-semibold transition-all duration-200 active:scale-[0.98] shadow-lg shadow-black/40" id="toggle-connect">
+        <span class="material-symbols-outlined text-base">mic</span>
+        <span id="toggle-label">Toca para Conectar</span>
+      </button>
+      <a href="/" class="font-mono text-[10px] text-outline hover:text-on-surface uppercase tracking-wider py-0.5">
+        [ Ir a Consola Master ]
+      </a>
+    </div>
+
+  </main>
+
+  <!-- QR Share Modal -->
+  <div class="fixed inset-0 bg-surface/95 backdrop-blur-md flex flex-col items-center justify-between p-6 opacity-0 pointer-events-none transition-opacity duration-300 z-50" id="qr-modal">
+    <div class="w-full flex justify-end">
+      <button class="p-1.5 text-on-surface-variant hover:text-on-surface" id="qr-close">
+        <span class="material-symbols-outlined text-xl">close</span>
+      </button>
+    </div>
+    <div class="flex flex-col items-center gap-4 text-center max-w-xs">
+      <div class="w-56 h-56 bg-surface-dim border border-[#313537] rounded-lg p-2 flex items-center justify-center">
+        <img id="qr-image" class="w-full h-full object-contain" alt="QR Recinto"/>
+      </div>
+      <div>
+        <div class="font-mono text-xs font-semibold uppercase text-on-surface">Vincular Micrófono Adicional</div>
+        <div class="font-mono text-[11px] text-[#879486] mt-1">Escanee para añadir otro dispositivo al recinto.</div>
+      </div>
+    </div>
+    <div class="font-mono text-[10px] text-[#879486] uppercase tracking-widest">
+      SYNCDB // VINCULACIÓN
+    </div>
+  </div>
+
+  <!-- Shared Acoustic Math Engine -->
+  <script src="/js/acoustic-math.js"></script>
+  <!-- Listener Node Controller -->
+  <script src="/js/listener.js"></script>
+</body>
+</html>
